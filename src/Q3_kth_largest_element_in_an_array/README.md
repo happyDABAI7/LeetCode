@@ -207,7 +207,7 @@ class Solution {
 
 
 
-方法三：桶排序法
+方法三：桶排序法（其中的特殊方法--计数排序）
 该方法的核心是利用数值范围有限的特点([-10000, 10000]），通过桶数组统计每个数值的出现次数，再从大到小“数”出第k 个元素。时间复杂度为0(n+m)(n是数组长度，m是数值范围大小20001)，效率极高，适合数值范围已知且较小的场景。
 时间复杂度为0(n+m)
 空间复杂度为O(1)
@@ -252,5 +252,304 @@ class Solution {
     }
 }
 
+
+
+
+方法五：三路划分
+每轮将数组划分为三个部分：小于、等于和大于基准数的所有元素。这样当发现第 k 大数字处在“等于基准数”的子数组中时，便可以直接返回该元素；否则和快速排序一样，进入子数组重复，减少不必要操作。
+关键改进点：使用随机数来选择基准点，使得基准点尽量靠近数组中间，提高效率。后面很多方法都是使用的随机数来取基准点。
+
+平均时间复杂度：O (n)
+最坏时间复杂度：O (n²)
+空间复杂度：O (log n)
+
+
+public class Solution {
+    private int quickSelect(List<Integer> nums, int k) {
+        // 随机选择基准数
+        Random rand = new Random();
+        int pivot = nums.get(rand.nextInt(nums.size()));
+        // 将大于、小于、等于 pivot 的元素划分至 big, small, equal 中
+        List<Integer> big = new ArrayList<>();
+        List<Integer> equal = new ArrayList<>();
+        List<Integer> small = new ArrayList<>();
+        for (int num : nums) {
+            if (num > pivot)
+                big.add(num);
+            else if (num < pivot)
+                small.add(num);
+            else
+                equal.add(num);
+        }
+        // 第 k 大元素在 big 中，递归划分
+        if (k <= big.size())
+            return quickSelect(big, k);
+        // 第 k 大元素在 small 中，递归划分
+        if (nums.size() - small.size() < k)
+            return quickSelect(small, k - nums.size() + small.size());
+        // 第 k 大元素在 equal 中，直接返回 pivot
+        return pivot;
+    }
+    
+    public int findKthLargest(int[] nums, int k) {
+        List<Integer> numList = new ArrayList<>();
+        for (int num : nums) {
+            numList.add(num);
+        }
+        return quickSelect(numList, k);
+    }
+}
+
+
+
+
+方法六：和方法五相同，实现方式不同
+
+class Solution {
+public:
+    /**
+     * 找到数组中第 k 大的元素
+     * 
+     * 算法：三路快速选择 (3-Way QuickSelect)
+     * 时间复杂度：平均 O(n)，最坏 O(n²)
+     * 空间复杂度：O(log n) 递归栈
+     * 
+     * 核心思想：
+     * 1. 使用三路划分将数组分为：< pivot, == pivot, > pivot 三部分
+     * 2. 根据 k 的位置决定在哪个区间继续查找
+     * 3. 相比二路划分，三路划分对重复元素更高效
+     */
+    int findKthLargest(vector<int>& nums, int k) {
+        // 转换问题：第 k 大 = 第 (n-k) 小（从0开始索引）
+        // 例如：数组长度6，找第2大 -> 找索引为4的元素（第5小）
+        k = nums.size() - k;
+
+        /**
+         * 三路快速选择递归函数
+         * @param l 左边界（包含）
+         * @param r 右边界（包含）
+         * @return 第 k 小的元素值
+         */
+        function<int(int, int)> quickSelect = [&](int l, int r) -> int {
+            // ==================== 步骤1: 选择并放置 pivot ====================
+            
+            // 随机选择一个索引作为 pivot（避免最坏情况）
+            int rndIndex = l + rand() % (r - l + 1);
+            
+            // 将随机选中的元素交换到最左边
+            swap(nums[rndIndex], nums[l]);
+            int pivot = nums[l];  // pivot 现在在 nums[l]
+            
+            // ==================== 步骤2: 三路划分初始化 ====================
+            
+            // 三路划分的三个指针：
+            // lt (less than): [l, lt) 表示小于 pivot 的区域
+            // gt (greater than): (gt, r] 表示大于 pivot 的区域  
+            // i: 当前处理位置，[lt, i) 表示等于 pivot 的区域
+            int lt = l;   // 小于区域的右边界（不包含）
+            int gt = r;   // 大于区域的左边界（不包含）
+            int i = l;    // 当前扫描位置
+            
+            // ==================== 步骤3: 三路划分过程 ====================
+            
+            // 循环不变式：
+            // [l, lt)     : 所有元素 < pivot
+            // [lt, i)     : 所有元素 == pivot
+            // [i, gt]     : 未处理的元素
+            // (gt, r]     : 所有元素 > pivot
+            
+            while (i <= gt) {
+                if (nums[i] < pivot) {
+                    // 情况1: 当前元素小于 pivot
+                    // 将其交换到小于区域，两个指针都前进
+                    swap(nums[lt++], nums[i++]);
+                    // lt++ : 扩展小于区域
+                    // i++  : 因为从 lt 换过来的元素一定 == pivot（已处理过）
+                    
+                } else if (nums[i] > pivot) {
+                    // 情况2: 当前元素大于 pivot
+                    // 将其交换到大于区域，i 不动（因为换过来的元素未处理）
+                    swap(nums[i], nums[gt--]);
+                    // gt-- : 扩展大于区域
+                    // i 不变: 需要重新检查换过来的 nums[i]
+                    
+                } else {
+                    // 情况3: 当前元素等于 pivot
+                    // 保持在等于区域，i 前进
+                    i++;
+                }
+            }
+            
+            // ==================== 步骤4: 划分完成，决定递归方向 ====================
+            
+            // 循环结束后的状态：
+            // [l, lt)   : 所有元素 < pivot
+            // [lt, gt]  : 所有元素 == pivot  
+            // (gt, r]   : 所有元素 > pivot
+            
+            if (k < lt) {
+                // k 在小于区域，继续在左半部分查找
+                return quickSelect(l, lt - 1);
+                
+            } else if (k > gt) {
+                // k 在大于区域，继续在右半部分查找
+                return quickSelect(gt + 1, r);
+                
+            } else {
+                // lt <= k <= gt，k 在等于区域
+                // 找到答案！所有等于 pivot 的元素都是答案
+                return pivot;
+            }
+        };
+
+        return quickSelect(0, nums.size() - 1);
+    }
+};
+
+
+
+
+方法七：优先队列（本质是构造k个元素的小根堆）
+PriorityQueue优先队列，会自动将队列中的元素按规则排序(例如这里，是自动将元素按小根堆排序)。
+时间复杂度：O(nlogk)，每个元素最多进行一次堆操作；
+空间复杂度：O(k)，「优先队列」的大小。
+
+import java.util.Comparator;
+import java.util.PriorityQueue;
+class Solution {
+    public int findKthLargest(int[] nums, int k) {
+        PriorityQueue<Integer> q = new PriorityQueue<>((a,b)->a-b);
+        for (int x : nums) {
+            if (q.size() < k || q.peek() < x) q.add(x);
+            if (q.size() > k) q.poll();
+        }
+        return q.peek();
+    }
+}
+//其中的(a,b)->a-b是一个比较器（Comparator），用于定义元素的 “优先级规则”（即排序规则），这里是元素 从小到大 的顺序(当a < b时，a - b返回负数，此时认为a的优先级比b高)。
+//同样作用：PriorityQueue<Integer> minHeap = new PriorityQueue<>(k, Comparator.comparingInt(a -> a));
+
+
+方法八：对方法七优先队列进行优化-->当k是前2/n大的元素，使用小根堆，否则，使用大根堆
+优化后空间复杂度降至 O(min(k, n - k))
+
+public int findKthLargest(int[] nums, int k) {
+    int n = nums.length;
+    // 当k较大时，转为找第(n - k + 1)小元素，用大顶堆
+    if (k > n - k) {
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        int m = n - k + 1; // 需要维护的元素数量
+        for (int num : nums) {
+            maxHeap.add(num);
+            if (maxHeap.size() > m) {
+                maxHeap.poll(); // 移除最大元素，保留前m小的元素
+            }
+        }
+        return maxHeap.peek();
+    } else {
+        // 原逻辑：小顶堆维护前k大的元素
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        for (int num : nums) {
+            minHeap.add(num);
+            if (minHeap.size() > k) {
+                minHeap.poll();
+            }
+        }
+        return minHeap.peek();
+    }
+}
+
+
+方法九：方法一稍微不同的解法
+
+import java.util.Random;
+
+public class Solution {
+
+    private final static Random RANDOM = new Random(System.currentTimeMillis());
+
+    public int findKthLargest(int[] nums, int k) {
+        int n = nums.length;
+        int left = 0;
+        int right = n - 1;
+        int target = n - k;
+        while (true) {
+            int j = partition(nums, left, right);
+            if (j == target) {
+                return nums[j];
+            } else if (j < target) {
+                left = j + 1;
+            } else {
+                right = j - 1;
+            }
+        }
+    }
+
+    private int partition(int[] nums, int left, int right) {
+        int randomIndex = left + RANDOM.nextInt(right - left + 1);
+        swap(nums, left, randomIndex);
+        // nums[left + 1..le) <= pivot，nums(ge..right] >= pivot;
+        int pivot = nums[left];
+        int le = left + 1;
+        int ge = right;
+        while (true) {
+            while (le <= ge && nums[le] < pivot) {
+                le++;
+            }
+            while (le <= ge && nums[ge] > pivot) {
+                ge--;
+            }
+            if (le >= ge) {
+                break;
+            }
+            swap(nums, le, ge);
+            le++;
+            ge--;
+        }
+        swap(nums, left, ge);
+        return ge;
+    }
+
+    private void swap(int[] nums, int index1, int index2) {
+        int temp = nums[index1];
+        nums[index1] = nums[index2];
+        nums[index2] = temp;
+    }
+
+}
+
+
+
+
+方法十：值域映射 + 树状数组 + 二分
+时间复杂度：将所有数字放入树状数组复杂度为 O(nlogm)；二分出答案复杂度为 O(logm)，其中 m=(2×10)4为值域大小。整体复杂度为 O(nlogm)
+空间复杂度：O(m)
+
+
+class Solution {
+    int M = 10010, N = 2 * M;
+    int[] tr = new int[N];
+    int lowbit(int x) {
+        return x & -x;
+    }
+    int query(int x) {
+        int ans = 0;
+        for (int i = x; i > 0; i -= lowbit(i)) ans += tr[i];
+        return ans;
+    }
+    void add(int x) {
+        for (int i = x; i < N; i += lowbit(i)) tr[i]++;
+    }
+    public int findKthLargest(int[] nums, int k) {
+        for (int x : nums) add(x + M);
+        int l = 0, r = N - 1;
+        while (l < r) {
+            int mid = l + r + 1 >> 1;
+            if (query(N - 1) - query(mid - 1) >= k) l = mid;
+            else r = mid - 1;
+        }
+        return r - M;
+    }
+}
 
 
