@@ -8,7 +8,7 @@
 
 注意：题目意思是将二叉树改成右斜树，所以节点类型还是TreeNode；
 
-&nbsp;        且右斜树顺序和二叉树先序遍历顺序相同。
+        且右斜树顺序和二叉树先序遍历顺序相同。
 
 
 
@@ -16,7 +16,7 @@
 
 先前序遍历二叉树，将节点存入可变数组List<TreeNode> list = new ArrayList<TreeNode>();
 
-&nbsp;            再依次放入右斜树中，实现“单链表”。
+            再依次放入右斜树中，实现“单链表”。
 
 Tn=O(n)
 
@@ -30,71 +30,71 @@ Sn=O(n)
 
 /\*\*
 
-&nbsp;\* Definition for a binary tree node.
+\* Definition for a binary tree node.
 
-&nbsp;\* public class TreeNode {
+\* public class TreeNode {
 
-&nbsp;\*     int val;
+\*     int val;
 
-&nbsp;\*     TreeNode left;
+\*     TreeNode left;
 
-&nbsp;\*     TreeNode right;
+\*     TreeNode right;
 
-&nbsp;\*     TreeNode() {}
+\*     TreeNode() {}
 
-&nbsp;\*     TreeNode(int val) { this.val = val; }
+\*     TreeNode(int val) { this.val = val; }
 
-&nbsp;\*     TreeNode(int val, TreeNode left, TreeNode right) {
+\*     TreeNode(int val, TreeNode left, TreeNode right) {
 
-&nbsp;\*         this.val = val;
+\*         this.val = val;
 
-&nbsp;\*         this.left = left;
+\*         this.left = left;
 
-&nbsp;\*         this.right = right;
+\*         this.right = right;
 
-&nbsp;\*     }
+\*     }
 
-&nbsp;\* }
+\* }
 
-&nbsp;\*/
+\*/
 
 class Solution {
 
-&nbsp;   public void flatten(TreeNode root) {
+   public void flatten(TreeNode root) {
 
-&nbsp;       List<TreeNode> list=new ArrayList<>();  //前序遍历存储
+       List<TreeNode> list=new ArrayList<>();  //前序遍历存储
 
-&nbsp;       bianli(root,list); 
+       bianli(root,list); 
 
-&nbsp;       for(int i=1;i<list.size();i++){  //构造右斜树
+       for(int i=1;i<list.size();i++){  //构造右斜树
 
-&nbsp;           TreeNode prev =list.get(i-1),curr=list.get(i);
+           TreeNode prev =list.get(i-1),curr=list.get(i);
 
-&nbsp;           prev.left=null;
+           prev.left=null;
 
-&nbsp;           prev.right=curr;
+           prev.right=curr;
 
-&nbsp;       }
+       }
 
-&nbsp;       
+       
 
-&nbsp;   }
+   }
 
 
 
-&nbsp;   public void bianli(TreeNode root,List<TreeNode> list){
+   public void bianli(TreeNode root,List<TreeNode> list){
 
-&nbsp;       if(root!=null){   //鲁棒性
+       if(root!=null){   //鲁棒性
 
-&nbsp;           list.add(root);     //根
+           list.add(root);     //根
 
-&nbsp;           bianli(root.left,list);    //左
+           bianli(root.left,list);    //左
 
-&nbsp;           bianli(root.right,list);   //右
+           bianli(root.right,list);   //右
 
-&nbsp;       }
+       }
 
-&nbsp;   }
+   }
 
 }
 
@@ -103,56 +103,50 @@ class Solution {
 
 
 
-
-
-
-
-
-
-
 //迭代法
+
 
 class Solution {
 
-&nbsp;   public void flatten(TreeNode root) {
+   public void flatten(TreeNode root) {
 
-&nbsp;       List<TreeNode> list = new ArrayList<TreeNode>();
+       List<TreeNode> list = new ArrayList<TreeNode>();
 
-&nbsp;       Deque<TreeNode> stack = new LinkedList<TreeNode>();
+       Deque<TreeNode> stack = new LinkedList<TreeNode>();
 
-&nbsp;       TreeNode node = root;
+       TreeNode node = root;
 
-&nbsp;       while (node != null || !stack.isEmpty()) {
+       while (node != null || !stack.isEmpty()) {
 
-&nbsp;           while (node != null) {
+           while (node != null) {
 
-&nbsp;               list.add(node);
+               list.add(node);
 
-&nbsp;               stack.push(node);
+               stack.push(node);
 
-&nbsp;               node = node.left;
+               node = node.left;
 
-&nbsp;           }
+           }
 
-&nbsp;           node = stack.pop();
+           node = stack.pop();
 
-&nbsp;           node = node.right;
+           node = node.right;
 
-&nbsp;       }
+       }
 
-&nbsp;       int size = list.size();
+       int size = list.size();
 
-&nbsp;       for (int i = 1; i < size; i++) {
+       for (int i = 1; i < size; i++) {
 
-&nbsp;           TreeNode prev = list.get(i - 1), curr = list.get(i);
+           TreeNode prev = list.get(i - 1), curr = list.get(i);
 
-&nbsp;           prev.left = null;
+           prev.left = null;
 
-&nbsp;           prev.right = curr;
+           prev.right = curr;
 
-&nbsp;       }
+       }
 
-&nbsp;   }
+   }
 
 }
 
@@ -192,51 +186,51 @@ Sn=O(n)
 
 class Solution {
 
-&nbsp;   public void flatten(TreeNode root) {
+   public void flatten(TreeNode root) {
 
-&nbsp;       if (root == null) {
+       if (root == null) {
 
-&nbsp;           return;
+           return;
 
-&nbsp;       }
+       }
 
-&nbsp;       Deque<TreeNode> stack = new LinkedList<TreeNode>();
+       Deque<TreeNode> stack = new LinkedList<TreeNode>();
 
-&nbsp;       stack.push(root);
+       stack.push(root);
 
-&nbsp;       TreeNode prev = null;
+       TreeNode prev = null;
 
-&nbsp;       while (!stack.isEmpty()) {
+       while (!stack.isEmpty()) {
 
-&nbsp;           TreeNode curr = stack.pop();
+           TreeNode curr = stack.pop();
 
-&nbsp;           if (prev != null) {  	 //展开为单链表
+           if (prev != null) {  	 //展开为单链表
 
-&nbsp;               prev.left = null;
+               prev.left = null;
 
-&nbsp;               prev.right = curr;  
+               prev.right = curr;  
 
-&nbsp;           }
+           }
 
-&nbsp;           TreeNode left = curr.left, right = curr.right;    //先序遍历
+           TreeNode left = curr.left, right = curr.right;    //先序遍历
 
-&nbsp;           if (right != null) {
+           if (right != null) {
 
-&nbsp;               stack.push(right);
+               stack.push(right);
 
-&nbsp;           }
+           }
 
-&nbsp;           if (left != null) {
+           if (left != null) {
 
-&nbsp;               stack.push(left);
+               stack.push(left);
 
-&nbsp;           }
+           }
 
-&nbsp;           prev = curr; 
+           prev = curr; 
 
-&nbsp;       }
+       }
 
-&nbsp;   }
+   }
 
 }
 
@@ -262,48 +256,182 @@ Sn=O(1)
 
 class Solution {
 
-&nbsp;   public void flatten(TreeNode root) {
+   public void flatten(TreeNode root) {
 
-&nbsp;       TreeNode curr = root;
+       TreeNode curr = root;
 
-&nbsp;       while (curr != null) {
+       while (curr != null) {
 
-&nbsp;           if (curr.left != null) {
+           if (curr.left != null) {
 
-&nbsp;               TreeNode next = curr.left;
+               TreeNode next = curr.left;
 
-&nbsp;               TreeNode predecessor = next;
+               TreeNode predecessor = next;
 
-&nbsp;               while (predecessor.right != null) {
+               while (predecessor.right != null) {
 
-&nbsp;                   predecessor = predecessor.right;
+                   predecessor = predecessor.right;
 
-&nbsp;               }
+               }
 
-&nbsp;               predecessor.right = curr.right;
+               predecessor.right = curr.right;
 
-&nbsp;               curr.left = null;
+               curr.left = null;
 
-&nbsp;               curr.right = next;
+               curr.right = next;
 
-&nbsp;           }
+           }
 
-&nbsp;           curr = curr.right;
+           curr = curr.right;
 
-&nbsp;       }
+       }
 
-&nbsp;   }
+   }
 
+}
+
+
+//小变体
+public void flatten(TreeNode root) {
+    while (root != null) { 
+        //左子树为 null，直接考虑下一个节点
+        if (root.left == null) {   //不同点1：利用if语句稍微减少部分无意义操作
+            root = root.right;
+        } else {
+            // 找左子树最右边的节点
+            TreeNode pre = root.left;
+            while (pre.right != null) {
+                pre = pre.right;
+            } 
+            //将原来的右子树接到左子树的最右边节点
+            pre.right = root.right;
+            // 将左子树插入到右子树的地方
+            root.right = root.left;
+            root.left = null;
+            // 考虑下一个节点
+            root = root.right;  //
+        }
+    }
+}
+
+
+
+方法四：基于后序遍历的递归方法，原地展开二叉树为单链表
+左右根的顺序自下而上将二叉树改成顺序正确的单链表（相较于前三种方法，关键在于“原地操作”，前三种方法都使用了新链表来接收数据）
+
+时间复杂度：O(n)（线性时间，与节点总数成正比）；
+空间复杂度：O(logn)（取决于树的高度，最坏为O(n)）。
+
+
+class Solution {
+    public void flatten(TreeNode root) {
+        if(root == null){
+            return ;
+        }
+        //将根节点的左子树变成链表
+        flatten(root.left);
+        //将根节点的右子树变成链表
+        flatten(root.right);
+        TreeNode temp = root.right;
+        //把树的右边换成左边的链表
+        root.right = root.left;
+        //记得要将左边置空
+        root.left = null;
+        //找到树的最右边的节点
+        while(root.right != null) root = root.right;
+        //把右边的链表接到刚才树的最右边的节点
+        root.right = temp;
+    }
+}
+
+
+
+方法五：右子树 - 左子树 - 根的顺序 DFS 二叉树，并利用头插法构造单链表
+也是一种自下而上的逐渐修正方法
+时间复杂度：O(n)，其中 n 是二叉树的节点个数。
+空间复杂度：O(n)。递归需要 O(n) 的栈空间，平均情况下O(logn)。
+
+class Solution {
+    private TreeNode head;  //head初始为NULL，类似c++的单链表指针
+
+    public void flatten(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        flatten(root.right);
+        flatten(root.left);
+        root.left = null;
+        root.right = head; // 头插法，相当于链表的 root.next = head
+        head = root; // 现在链表头节点是 root
+    }
 }
 
 
 
 
 
+方法六：分治法
+不使用head指针，只在DFS中构造单链表
+和方法四原理相同，但实现方法稍不一样，方法四更直观，更易理解，但较为繁复，有大量重复寻找“最右边结点”的步骤；
+方法六则无该重复内容，但return语句的语法逻辑复杂，不易想到
+时间复杂度：O(n)，其中 n 是二叉树的节点个数。
+空间复杂度：O(n)。递归需要 O(n) 的栈空间，平均O(logn)。
+
+
+class Solution {
+    public void flatten(TreeNode root) {
+        dfs(root);
+    }
+
+    private TreeNode dfs(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode leftTail = dfs(root.left);
+        TreeNode rightTail = dfs(root.right);
+        if (leftTail != null) {
+            leftTail.right = root.right; // 左子树链表 -> 右子树链表
+            root.right = root.left; // 当前节点 -> 左右子树合并后的链表
+            root.left = null;
+        }
+        return rightTail != null ? rightTail : leftTail != null ? leftTail : root;
+    }
+}
 
 
 
 
+方法七：显示利用栈进行类似递归的方法
+和方法二一模一样，但方法二利用队列和可变数组模拟栈的使用，这里直接使用栈
+更推荐方法二，因为Stack 存在设计缺陷，而 Deque 是更规范、更高效的栈实现方式
+
+
+public void flatten(TreeNode root) { 
+    if (root == null){
+        return;
+    }
+    Stack<TreeNode> s = new Stack<TreeNode>();
+    s.push(root);
+    TreeNode pre = null;
+    while (!s.isEmpty()) {
+        TreeNode temp = s.pop(); 
+        /***********修改的地方*************/
+        if(pre!=null){
+            pre.right = temp;
+            pre.left = null;
+        }
+        /********************************/
+        if (temp.right != null){
+            s.push(temp.right);
+        }
+        if (temp.left != null){
+            s.push(temp.left);
+        } 
+        /***********修改的地方*************/
+        pre = temp;
+        /********************************/
+    }
+}
 
 
 
